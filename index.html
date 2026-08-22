@@ -1,70 +1,458 @@
 <!DOCTYPE html>
-<html>
+<html lang="si">
 <head>
-    <title>Physics Motion Simulator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics Motion Simulator - Van & Ball</title>
     <style>
-        body { font-family: sans-serif; text-align: center; background: #f0f2f5; }
-        canvas { background: #fff; border: 2px solid #333; margin-top: 10px; }
-        .controls { margin: 15px; }
-        button { padding: 8px 16px; font-size: 14px; cursor: pointer; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e1b4b);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #38bdf8;
+            font-size: 1.8rem;
+            text-align: center;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        }
+        p.subtitle {
+            color: #94a3b8;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #38bdf8;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #f8fafc;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .input-group input:focus {
+            border-color: #38bdf8;
+        }
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            grid-column: 1 / -1;
+            justify-content: center;
+            margin-top: 5px;
+        }
+        button {
+            padding: 10px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-start {
+            background: linear-gradient(90deg, #0284c7, #2563eb);
+            color: white;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);
+        }
+        .btn-start:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(2, 132, 199, 0.6); }
+        .btn-reset {
+            background: #475569;
+            color: #f8fafc;
+        }
+        .btn-reset:hover { background: #64748b; }
+
+        canvas {
+            width: 100%;
+            height: 380px;
+            background: #090d16;
+            border-radius: 12px;
+            border: 1px solid #1e293b;
+            display: block;
+        }
+
+        .hud-panel {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .hud-item {
+            text-align: center;
+            margin: 5px 10px;
+        }
+        .hud-label { font-size: 0.8rem; color: #94a3b8; }
+        .hud-value { font-size: 1.1rem; font-weight: bold; color: #4ade80; margin-top: 2px; }
+
+        .result-box {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.05rem;
+            display: none;
+        }
+        .result-success { background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; color: #4ade80; }
+        .result-behind { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; }
+        .result-front { background: rgba(234, 179, 8, 0.2); border: 1px solid #eab308; color: #fde047; }
     </style>
 </head>
 <body>
-    <h2>Van & Ball Motion Simulator</h2>
-    <div class="controls">
-        <label>Acceleration (a): </label>
-        <input type="number" id="acc" value="0" step="1" style="width: 50px;"> m/s²
-        <button onclick="startSimulation()">Start</button>
+
+    <h1>🚐 Relative Motion Simulator</h1>
+    <p class="subtitle">චලනය වන වෑන් රථයකින් ඉහළට විසි කරන ලද බෝලයක චලිතය</p>
+
+    <div class="container">
+        <div class="controls-grid">
+            <div class="input-group">
+                <label for="v_van">වෑන් රථයේ ප්‍රවේගය (m/s)</label>
+                <input type="number" id="v_van" value="50" step="5">
+            </div>
+            <div class="input-group">
+                <label for="u_y">බෝලයේ සිරස් ප්‍රවේගය (m/s)</label>
+                <input type="number" id="u_y" value="30" step="5">
+            </div>
+            <div class="input-group">
+                <label for="acc">වෑන් රථයේ ත්වරණය (m/s²)</label>
+                <input type="number" id="acc" value="0" step="1">
+            </div>
+            <div class="input-group">
+                <label for="gravity">ගුරුත්වජ ත්වරණය g (m/s²)</label>
+                <input type="number" id="gravity" value="10" step="0.5">
+            </div>
+            <div class="btn-group">
+                <button class="btn-start" onclick="startSimulation()">Start Animation</button>
+                <button class="btn-reset" onclick="resetSimulation()">Reset</button>
+            </div>
+        </div>
+
+        <canvas id="simCanvas" width="860" height="380"></canvas>
+
+        <div class="hud-panel">
+            <div class="hud-item">
+                <div class="hud-label">ගතවූ කාලය (t)</div>
+                <div class="hud-value" id="hud-time">0.0 s</div>
+            </div>
+            <div class="hud-item">
+                <div class="hud-label">බෝලය ගිය දුර (S<sub>ball</sub>)</div>
+                <div class="hud-value" id="hud-ball">0.0 m</div>
+            </div>
+            <div class="hud-item">
+                <div class="hud-label">වෑන් රථය ගිය දුර (S<sub>van</sub>)</div>
+                <div class="hud-value" id="hud-van">0.0 m</div>
+            </div>
+            <div class="hud-item">
+                <div class="hud-label">දුරවල් අතර වෙනස (&Delta;S)</div>
+                <div class="hud-value" id="hud-diff">0.0 m</div>
+            </div>
+        </div>
+
+        <div id="resultBox" class="result-box"></div>
     </div>
-    <canvas id="simCanvas" width="800" height="400"></canvas>
 
     <script>
         const canvas = document.getElementById('simCanvas');
         const ctx = canvas.getContext('2d');
 
-        function startSimulation() {
-            let t = 0;
-            let dt = 0.05;
-            let g = 10;
-            
-            let v_van_0 = 50; // Initial van speed
-            let u_y = 30;     // Initial ball vertical speed
-            let a_van = parseFloat(document.getElementById('acc').value);
+        let animationFrame = null;
+        let isRunning = false;
+        let ballTrail = [];
 
+        function drawScene(vanX, ballX, ballY, time, scale) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const groundY = 300;
+            const cameraX = Math.max(vanX, ballX) - canvas.width / (2 * scale);
+
+            // Sky Background Gradient
+            let skyGradient = ctx.createLinearGradient(0, 0, 0, groundY);
+            skyGradient.addColorStop(0, '#0b0f19');
+            skyGradient.addColorStop(1, '#1b263b');
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, canvas.width, groundY);
+
+            // Stars in background
+            ctx.fillStyle = '#ffffff';
+            for (let i = 0; i < 30; i++) {
+                let starX = (i * 97) % canvas.width;
+                let starY = (i * 33) % (groundY - 50);
+                ctx.fillRect(starX, starY, 1.5, 1.5);
+            }
+
+            // Road Background
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+
+            // Road Lines (Dashed)
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([20, 20]);
+            ctx.lineDashOffset = -(cameraX * scale) % 40;
+            ctx.beginPath();
+            ctx.moveTo(0, groundY + 40);
+            ctx.lineTo(canvas.width, groundY + 40);
+            ctx.stroke();
+            ctx.setLineDash([]); // Reset dash
+
+            // Distance Markers on Road
+            ctx.fillStyle = '#64748b';
+            ctx.font = '12px sans-serif';
+            for (let m = 0; m <= 2000; m += 50) {
+                let screenX = (m - cameraX) * scale;
+                if (screenX >= -50 && screenX <= canvas.width + 50) {
+                    ctx.fillRect(screenX, groundY, 2, 8);
+                    ctx.fillText(m + 'm', screenX - 10, groundY + 22);
+                }
+            }
+
+            // Draw Ball Trajectory Trail
+            if (ballTrail.length > 1) {
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(236, 72, 153, 0.5)';
+                ctx.lineWidth = 2;
+                for (let i = 0; i < ballTrail.length; i++) {
+                    let ptX = (ballTrail[i].x - cameraX) * scale;
+                    let ptY = groundY - (ballTrail[i].y * scale);
+                    if (i === 0) ctx.moveTo(ptX, ptY);
+                    else ctx.lineTo(ptX, ptY);
+                }
+                ctx.stroke();
+            }
+
+            // Draw Detailed Van
+            let vanScreenX = (vanX - cameraX) * scale;
+            let vanScreenY = groundY - 10;
+            drawVan(vanScreenX, vanScreenY, time, vanX);
+
+            // Draw Ball
+            let ballScreenX = (ballX - cameraX) * scale;
+            let ballScreenY = groundY - (ballY * scale);
+
+            if (ballY >= 0) {
+                ctx.beginPath();
+                ctx.arc(ballScreenX, ballScreenY, 7, 0, Math.PI * 2);
+                ctx.fillStyle = '#f43f5e';
+                ctx.shadowColor = '#f43f5e';
+                ctx.shadowBlur = 10;
+                ctx.fill();
+                ctx.shadowBlur = 0; // Reset shadow
+            }
+        }
+
+        function drawVan(x, y, time, dist) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            // Van Main Body
+            ctx.fillStyle = '#0284c7'; // Cyan body
+            ctx.beginPath();
+            ctx.roundRect(-50, -45, 90, 35, [8, 12, 4, 4]);
+            ctx.fill();
+
+            // Van Front Cab Nose
+            ctx.fillStyle = '#0369a1';
+            ctx.beginPath();
+            ctx.roundRect(30, -32, 20, 22, [0, 8, 4, 0]);
+            ctx.fill();
+
+            // Windshield Window
+            ctx.fillStyle = '#38bdf8';
+            ctx.beginPath();
+            ctx.moveTo(25, -40);
+            ctx.lineTo(45, -30);
+            ctx.lineTo(45, -20);
+            ctx.lineTo(25, -20);
+            ctx.closePath();
+            ctx.fill();
+
+            // Side Windows
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(-35, -40, 22, 12);
+            ctx.fillRect(-8, -40, 22, 12);
+
+            // Headlight
+            ctx.fillStyle = '#fde047';
+            ctx.fillRect(48, -22, 4, 6);
+
+            // Open Roof Hatch / Throwing Person Hand Indicator
+            ctx.fillStyle = '#e2e8f0';
+            ctx.fillRect(-10, -48, 15, 4);
+
+            // Wheels (Rotating based on distance)
+            drawWheel(-25, -5, dist);
+            drawWheel(25, -5, dist);
+
+            ctx.restore();
+        }
+
+        function drawWheel(wx, wy, dist) {
+            ctx.save();
+            ctx.translate(wx, wy);
+            ctx.rotate(dist * 0.1); // Wheel rotation formula
+
+            // Outer Tire
+            ctx.beginPath();
+            ctx.arc(0, 0, 11, 0, Math.PI * 2);
+            ctx.fillStyle = '#1e293b';
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#475569';
+            ctx.stroke();
+
+            // Inner Rim
+            ctx.beginPath();
+            ctx.arc(0, 0, 5, 0, Math.PI * 2);
+            ctx.fillStyle = '#94a3b8';
+            ctx.fill();
+
+            // Rim Spokes
+            ctx.beginPath();
+            ctx.moveTo(-5, 0); ctx.lineTo(5, 0);
+            ctx.moveTo(0, -5); ctx.lineTo(0, 5);
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function startSimulation() {
+            if (isRunning) return;
+
+            let v_van_0 = parseFloat(document.getElementById('v_van').value);
+            let u_y = parseFloat(document.getElementById('u_y').value);
+            let a_van = parseFloat(document.getElementById('acc').value);
+            let g = parseFloat(document.getElementById('gravity').value);
+
+            let t = 0;
+            let dt = 0.03; // Time step
+            let scale = 1.8; // Canvas visual scaling factor
+
+            // Initial positions
+            let initialRoofY = 48; // Ball height above ground relative to van roof
             let vanX = 50;
             let ballX = 50;
-            let ballY = 300;
+            let ballY = initialRoofY / scale;
 
-            let interval = setInterval(() => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ballTrail = [];
+            document.getElementById('resultBox').style.display = 'none';
+            isRunning = true;
 
-                // Update positions
-                vanX = 50 + (v_van_0 * t + 0.5 * a_van * t * t) * 2; // Scaled for screen
-                ballX = 50 + (v_van_0 * t) * 2;
-                ballY = 300 - (u_y * t - 0.5 * g * t * t) * 2;
+            function animate() {
+                // Physics Calculations
+                vanX = 50 + (v_van_0 * t + 0.5 * a_van * t * t);
+                ballX = 50 + (v_van_0 * t); // Constant horizontal speed
+                ballY = (initialRoofY / scale) + (u_y * t - 0.5 * g * t * t);
 
-                // Draw Ground
-                ctx.beginPath();
-                ctx.moveTo(0, 320); ctx.lineTo(800, 320);
-                ctx.stroke();
+                let actualBallY = u_y * t - 0.5 * g * t * t;
 
-                // Draw Van
-                ctx.fillStyle = '#3498db';
-                ctx.fillRect(vanX - 30, 270, 60, 50);
+                if (actualBallY >= 0) {
+                    ballTrail.push({ x: ballX, y: ballY });
+                }
 
-                // Draw Ball
-                ctx.fillStyle = '#e74c3c';
-                ctx.beginPath();
-                ctx.arc(ballX, ballY, 8, 0, Math.PI * 2);
-                ctx.fill();
+                // Update HUD Numbers
+                let s_van = v_van_0 * t + 0.5 * a_van * t * t;
+                let s_ball = v_van_0 * t;
+                let diff = s_ball - s_van;
+
+                document.getElementById('hud-time').innerText = t.toFixed(2) + ' s';
+                document.getElementById('hud-ball').innerText = s_ball.toFixed(1) + ' m';
+                document.getElementById('hud-van').innerText = s_van.toFixed(1) + ' m';
+                document.getElementById('hud-diff').innerText = Math.abs(diff).toFixed(1) + ' m';
+
+                // Draw Scene
+                drawScene(vanX, ballX, ballY, t, scale);
 
                 t += dt;
 
-                if (ballY >= 300 && t > 0.1) {
-                    clearInterval(interval);
+                // Check if Ball returned to ground/van level
+                if (actualBallY < 0 && t > 0.1) {
+                    isRunning = false;
+                    showResult(diff, a_van);
+                } else {
+                    animationFrame = requestAnimationFrame(animate);
                 }
-            }, 30);
+            }
+
+            animate();
         }
+
+        function showResult(diff, acceleration) {
+            let resBox = document.getElementById('resultBox');
+            resBox.style.display = 'block';
+
+            if (Math.abs(diff) < 0.5) {
+                resBox.className = 'result-box result-success';
+                resBox.innerHTML = '🎯 බෝලය නැවත වෑන් රථය (අත) තුළටම පතිත විය! <br><small>(නිශ්චල හෝ නියත ප්‍රවේගයෙන් යන විට)</small>';
+            } else if (acceleration > 0) {
+                resBox.className = 'result-box result-behind';
+                resBox.innerHTML = '⚠️ වෑන් රථය ත්වරණය වූ නිසා බෝලය වෑන් රථයට <b>පසුපසින්</b> වැටුණි! (&Delta;S = ' + Math.abs(diff).toFixed(1) + 'm)';
+            } else {
+                resBox.className = 'result-box result-front';
+                resBox.innerHTML = '⚠️ වෑන් රථය මන්දනය වූ නිසා බෝලය වෑන් රථයට <b>ඉදිරියෙන්</b> වැටුණි! (&Delta;S = ' + Math.abs(diff).toFixed(1) + 'm)';
+            }
+        }
+
+        function resetSimulation() {
+            if (animationFrame) cancelAnimationFrame(animationFrame);
+            isRunning = false;
+            ballTrail = [];
+
+            document.getElementById('hud-time').innerText = '0.0 s';
+            document.getElementById('hud-ball').innerText = '0.0 m';
+            document.getElementById('hud-van').innerText = '0.0 m';
+            document.getElementById('hud-diff').innerText = '0.0 m';
+            document.getElementById('resultBox').style.display = 'none';
+
+            // Draw static initial scene
+            drawScene(50, 50, 48 / 1.8, 0, 1.8);
+        }
+
+        // Draw initial static state on load
+        resetSimulation();
     </script>
 </body>
 </html>
