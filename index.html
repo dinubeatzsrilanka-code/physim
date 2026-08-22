@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Physics Motion Simulator</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #f0f2f5; }
+        canvas { background: #fff; border: 2px solid #333; margin-top: 10px; }
+        .controls { margin: 15px; }
+        button { padding: 8px 16px; font-size: 14px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>Van & Ball Motion Simulator</h2>
+    <div class="controls">
+        <label>Acceleration (a): </label>
+        <input type="number" id="acc" value="0" step="1" style="width: 50px;"> m/s²
+        <button onclick="startSimulation()">Start</button>
+    </div>
+    <canvas id="simCanvas" width="800" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function startSimulation() {
+            let t = 0;
+            let dt = 0.05;
+            let g = 10;
+            
+            let v_van_0 = 50; // Initial van speed
+            let u_y = 30;     // Initial ball vertical speed
+            let a_van = parseFloat(document.getElementById('acc').value);
+
+            let vanX = 50;
+            let ballX = 50;
+            let ballY = 300;
+
+            let interval = setInterval(() => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Update positions
+                vanX = 50 + (v_van_0 * t + 0.5 * a_van * t * t) * 2; // Scaled for screen
+                ballX = 50 + (v_van_0 * t) * 2;
+                ballY = 300 - (u_y * t - 0.5 * g * t * t) * 2;
+
+                // Draw Ground
+                ctx.beginPath();
+                ctx.moveTo(0, 320); ctx.lineTo(800, 320);
+                ctx.stroke();
+
+                // Draw Van
+                ctx.fillStyle = '#3498db';
+                ctx.fillRect(vanX - 30, 270, 60, 50);
+
+                // Draw Ball
+                ctx.fillStyle = '#e74c3c';
+                ctx.beginPath();
+                ctx.arc(ballX, ballY, 8, 0, Math.PI * 2);
+                ctx.fill();
+
+                t += dt;
+
+                if (ballY >= 300 && t > 0.1) {
+                    clearInterval(interval);
+                }
+            }, 30);
+        }
+    </script>
+</body>
+</html>
