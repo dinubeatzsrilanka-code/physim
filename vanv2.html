@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Train Motion Physics Simulator - Relative Motion</title>
+    <title>Physics Motion Simulator Pro - Realistic Van & Ball Motion</title>
     <style>
         :root {
-            --bg-dark: #080c14;
-            --panel-bg: rgba(15, 23, 42, 0.85);
+            --bg-dark: #090d16;
+            --panel-bg: rgba(15, 23, 42, 0.8);
             --accent-cyan: #38bdf8;
             --accent-green: #4ade80;
             --accent-rose: #f43f5e;
             --accent-amber: #fbbf24;
+            --accent-purple: #a855f7;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: radial-gradient(circle at top, #111827, #0f172a, #030712);
+            background: radial-gradient(circle at top, #1e1b4b, #0f172a, #020617);
             color: #f8fafc;
             min-height: 100vh;
             display: flex;
@@ -35,10 +36,10 @@
         h1 {
             font-size: 2.1rem;
             font-weight: 800;
-            background: linear-gradient(to right, #fbbf24, #f97316, #ef4444);
+            background: linear-gradient(to right, #38bdf8, #818cf8, #c084fc);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 25px rgba(251, 191, 36, 0.3);
+            text-shadow: 0 0 25px rgba(56, 189, 248, 0.3);
         }
 
         p.subtitle {
@@ -83,7 +84,7 @@
         .control-item label {
             font-size: 0.8rem;
             font-weight: 600;
-            color: var(--accent-amber);
+            color: var(--accent-cyan);
         }
 
         .control-item input[type="number"] {
@@ -98,7 +99,7 @@
         }
 
         .control-item input[type="number"]:focus {
-            border-color: var(--accent-amber);
+            border-color: var(--accent-cyan);
         }
 
         .toggle-group {
@@ -140,21 +141,33 @@
         }
 
         .btn-start {
-            background: linear-gradient(135deg, #d97706, #ea580c);
+            background: linear-gradient(135deg, #0284c7, #2563eb);
             color: white;
-            box-shadow: 0 4px 15px rgba(217, 119, 6, 0.4);
+            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);
         }
 
         .btn-start:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(217, 119, 6, 0.6);
+            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.6);
         }
 
-        .btn-horn { background: #0284c7; color: #fff; }
-        .btn-horn:hover { background: #0369a1; }
+        .btn-reset {
+            background: #334155;
+            color: #f1f5f9;
+        }
 
-        .btn-reset { background: #334155; color: #f1f5f9; }
         .btn-reset:hover { background: #475569; }
+
+        .btn-train {
+            background: linear-gradient(135deg, #7c3aed, #9333ea);
+            color: white;
+            box-shadow: 0 4px 15px rgba(147, 51, 234, 0.4);
+        }
+
+        .btn-train:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(147, 51, 234, 0.6);
+        }
 
         .canvas-container {
             position: relative;
@@ -196,39 +209,38 @@
             border-radius: 10px;
             text-align: center;
             font-weight: 700;
-            font-size: 0.95rem;
+            font-size: 1rem;
             margin-top: 10px;
             animation: fadeIn 0.3s ease-in;
-            line-height: 1.5;
         }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
         .res-success { background: rgba(34, 197, 94, 0.15); border: 1px solid var(--accent-green); color: var(--accent-green); }
-        .res-roof { background: rgba(251, 191, 36, 0.18); border: 1px solid var(--accent-amber); color: #fde047; }
         .res-behind { background: rgba(244, 63, 94, 0.15); border: 1px solid var(--accent-rose); color: #fca5a5; }
+        .res-front { background: rgba(251, 191, 36, 0.15); border: 1px solid var(--accent-amber); color: #fde047; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>🚂 Train Motion Physics Simulator</h1>
-        <p class="subtitle">චලනය වන දුම්රියකින් ඉහළට විසි කළ වස්තුවක සාපේක්ෂ චලිතය</p>
+        <h1>🚐 Physics Motion Simulator Pro</h1>
+        <p class="subtitle">චලනය වන වෑන් රථයකින් ඉහළට විසි කරන ලද වස්තුවක සාපේක්ෂ චලිතය</p>
     </header>
 
     <div class="main-wrapper">
         <div class="glass-panel">
             <div class="controls-grid">
                 <div class="control-item">
-                    <label for="v_train">දුම්රියේ ප්‍රවේගය (m/s)</label>
-                    <input type="number" id="v_train" value="50" step="5">
+                    <label for="v_van">වෑන් රථයේ ප්‍රවේගය (m/s)</label>
+                    <input type="number" id="v_van" value="35" step="5">
                 </div>
                 <div class="control-item">
                     <label for="u_y">බෝලයේ සිරස් ප්‍රවේගය (m/s)</label>
                     <input type="number" id="u_y" value="25" step="5">
                 </div>
                 <div class="control-item">
-                    <label for="acc">දුම්රියේ ත්වරණය (m/s²)</label>
+                    <label for="acc">වෑන් රථයේ ත්වරණය (m/s²)</label>
                     <input type="number" id="acc" value="0" step="1">
                 </div>
                 <div class="control-item">
@@ -247,8 +259,8 @@
 
                 <div class="btn-group">
                     <button class="btn-start" onclick="startSimulation()">🚀 Start Simulation</button>
-                    <button class="btn-horn" onclick="playTrainHorn()">📢 Train Horn</button>
                     <button class="btn-reset" onclick="resetSimulation()">🔄 Reset</button>
+                    <button class="btn-train" onclick="goToTrainSimulation()">🚆 දුම්රියක් භාවිතයෙන්</button>
                 </div>
             </div>
 
@@ -266,8 +278,8 @@
                     <div class="hud-val" id="hud-ball">0.0 m</div>
                 </div>
                 <div class="hud-card">
-                    <div class="hud-title">දුම්රිය ගිය දුර (S<sub>train</sub>)</div>
-                    <div class="hud-val" id="hud-train">0.0 m</div>
+                    <div class="hud-title">වෑන් රථය ගිය දුර (S<sub>van</sub>)</div>
+                    <div class="hud-val" id="hud-van">0.0 m</div>
                 </div>
                 <div class="hud-card">
                     <div class="hud-title">සාපේක්ෂ දුර (&Delta;S)</div>
@@ -282,40 +294,13 @@
     <script>
         const canvas = document.getElementById('simCanvas');
         const ctx = canvas.getContext('2d');
+
+        // Audio Context for realistic sound effects
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        const scale = 2.2; // 1 meter = 2.2 pixels
-        const groundY = 350; // Ground Y position
-        const handHeightPx = 46; // Height of person's hand above ground in pixels
-        const handHeightMeters = handHeightPx / scale;
-
-        function playTrainHorn() {
-            if (!document.getElementById('chkSound').checked) return;
-            try {
-                let now = audioCtx.currentTime;
-                [311.13, 369.99, 622.25].forEach(freq => {
-                    let osc = audioCtx.createOscillator();
-                    let gain = audioCtx.createGain();
-                    let filter = audioCtx.createBiquadFilter();
-
-                    osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(freq, now);
-                    filter.type = 'lowpass';
-                    filter.frequency.value = 1100;
-
-                    osc.connect(filter);
-                    filter.connect(gain);
-                    gain.connect(audioCtx.destination);
-
-                    gain.gain.setValueAtTime(0, now);
-                    gain.gain.linearRampToValueAtTime(0.12, now + 0.08);
-                    gain.gain.setValueAtTime(0.12, now + 0.7);
-                    gain.gain.linearRampToValueAtTime(0, now + 1.0);
-
-                    osc.start(now);
-                    osc.stop(now + 1.0);
-                });
-            } catch(e){}
+        function goToTrainSimulation() {
+            // 
+            window.location.href = 'train.html'; 
         }
 
         function playSound(type) {
@@ -328,15 +313,15 @@
 
                 if (type === 'throw') {
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(200, audioCtx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(700, audioCtx.currentTime + 0.15);
+                    osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(650, audioCtx.currentTime + 0.15);
                     gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
                     gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
                     osc.start();
                     osc.stop(audioCtx.currentTime + 0.15);
                 } else if (type === 'land') {
                     osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(130, audioCtx.currentTime);
                     osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.2);
                     gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
                     gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.2);
@@ -349,31 +334,33 @@
         let animationFrame = null;
         let isRunning = false;
         let ballTrail = [];
-        let smokeParticles = [];
+        let particles = [];
+
+        // Animation States
         let throwArmAngle = 0;
         let isThrowingAnim = false;
 
         function startSimulation() {
-            if (isRunning || isThrowingAnim) return;
+            if (isRunning) return;
 
-            let v_train_0 = parseFloat(document.getElementById('v_train').value);
+            let v_van_0 = parseFloat(document.getElementById('v_van').value);
             let u_y = parseFloat(document.getElementById('u_y').value);
-            let a_train = parseFloat(document.getElementById('acc').value);
+            let a_van = parseFloat(document.getElementById('acc').value);
             let g = parseFloat(document.getElementById('gravity').value);
 
             let t = 0;
             let dt = 0.025;
-            let startPos = 160;
+            let scale = 2.2;
 
-            let personX = startPos;
+            let initialRoofY = 64; 
+            let startPos = 120;
+            let vanX = startPos;
             let ballX = startPos;
-            let ballY = handHeightMeters;
+            let ballY = initialRoofY / scale;
 
             ballTrail = [];
-            smokeParticles = [];
+            particles = [];
             document.getElementById('resultBox').style.display = 'none';
-
-            playTrainHorn();
 
             isThrowingAnim = true;
             let armProgress = 0;
@@ -381,9 +368,10 @@
             function animate() {
                 if (isThrowingAnim) {
                     armProgress += 0.08;
+                    // Flipped arm movement direction (throwing right)
                     throwArmAngle = Math.sin(armProgress * Math.PI) * 1.2;
 
-                    if (armProgress >= 0.5 && isThrowingAnim && armProgress < 0.58) {
+                    if (armProgress >= 0.5 && isThrowingAnim) {
                         playSound('throw');
                     }
 
@@ -397,51 +385,46 @@
                     throwArmAngle = 0;
                     t += dt;
 
-                    // Exact physics tracking
-                    personX = startPos + (v_train_0 * t + 0.5 * a_train * t * t);
-                    ballX = startPos + (v_train_0 * t);
-                    
+                    vanX = startPos + (v_van_0 * t + 0.5 * a_van * t * t);
+                    ballX = startPos + (v_van_0 * t);
                     let relY = u_y * t - 0.5 * g * t * t;
-                    ballY = handHeightMeters + relY;
+                    ballY = (initialRoofY / scale) + relY;
 
                     if (relY >= 0) {
                         ballTrail.push({ x: ballX, y: ballY });
                     }
 
-                    // Smoke emitting directly from Engine Chimney (+82px relative to person)
-                    if (Math.random() < 0.85) {
-                        let chimneyWorldX = personX + (82 / scale);
-                        let chimneyWorldY = 48 / scale;
+                  // Exhaust Smoke Particles from rear silencer
+if (Math.random() < 0.6) {
+    let exhaustWorldX = vanX - (62 / scale); 
+    let exhaustWorldY = 4;
 
-                        smokeParticles.push({
-                            x: chimneyWorldX,
-                            y: chimneyWorldY,
-                            vx: -1.2 - Math.random() * 0.8,
-                            vy: 0.5 + Math.random() * 0.4,
-                            size: 3 + Math.random() * 3,
-                            alpha: 0.75
-                        });
-                    }
-
-                    let s_train = v_train_0 * t + 0.5 * a_train * t * t;
-                    let s_ball = v_train_0 * t;
-                    let diff = s_ball - s_train;
+    particles.push({
+        x: exhaustWorldX,
+        y: exhaustWorldY,
+        vx: -1.5 - Math.random(),
+        vy: 0.2 + Math.random() * 0.3,
+        size: 3 + Math.random() * 4,
+        alpha: 0.6
+    });
+}
+                    let s_van = v_van_0 * t + 0.5 * a_van * t * t;
+                    let s_ball = v_van_0 * t;
+                    let diff = s_ball - s_van;
 
                     document.getElementById('hud-time').innerText = t.toFixed(2) + ' s';
                     document.getElementById('hud-ball').innerText = s_ball.toFixed(1) + ' m';
-                    document.getElementById('hud-train').innerText = s_train.toFixed(1) + ' m';
+                    document.getElementById('hud-van').innerText = s_van.toFixed(1) + ' m';
                     document.getElementById('hud-diff').innerText = Math.abs(diff).toFixed(1) + ' m';
 
-                    // Landed back at hand height
-                    if (relY <= 0 && t > 0.1) {
+                    if (relY < 0 && t > 0.1) {
                         isRunning = false;
-                        ballY = handHeightMeters;
                         playSound('land');
-                        showResult(diff, a_train);
+                        showResult(diff, a_van);
                     }
                 }
 
-                drawScene(personX, ballX, ballY, t, v_train_0 + a_train * t, u_y - g * t);
+                drawScene(vanX, ballX, ballY, t, scale, v_van_0 + a_van * t, u_y - g * t);
 
                 if (isRunning || isThrowingAnim) {
                     animationFrame = requestAnimationFrame(animate);
@@ -451,70 +434,107 @@
             animate();
         }
 
-        function drawScene(personX, ballX, ballY, time, curTrainVx, curBallVy) {
+        function drawScene(vanX, ballX, ballY, time, scale, curVanVx, curBallVy) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Center camera between Person and Ball
-            let centerPos = (personX + ballX) / 2;
-            const cameraX = centerPos - canvas.width / (2 * scale);
+            const groundY = 340;
+            const cameraX = Math.max(vanX, ballX) - canvas.width / (2.5 * scale);
 
-            // Night Sky Gradient
+            // Realistic Dusk/Sunset Sky Gradient
             let skyGrad = ctx.createLinearGradient(0, 0, 0, groundY);
-            skyGrad.addColorStop(0, '#030712');
-            skyGrad.addColorStop(0.5, '#0b1329');
-            skyGrad.addColorStop(1, '#1e293b');
+            skyGrad.addColorStop(0, '#0c1021');
+            skyGrad.addColorStop(0.4, '#1b1b3a');
+            skyGrad.addColorStop(0.75, '#4a154b');
+            skyGrad.addColorStop(1, '#ff5e36');
             ctx.fillStyle = skyGrad;
             ctx.fillRect(0, 0, canvas.width, groundY);
 
-            // Moon
-            ctx.fillStyle = '#fef08a';
+            // Sun Glow
+            let sunX = canvas.width - 150 - (cameraX * 0.05);
+            let sunGrad = ctx.createRadialGradient(sunX, groundY - 30, 10, sunX, groundY - 30, 90);
+            sunGrad.addColorStop(0, 'rgba(254, 215, 170, 0.9)');
+            sunGrad.addColorStop(0.5, 'rgba(249, 115, 22, 0.4)');
+            sunGrad.addColorStop(1, 'transparent');
+            ctx.fillStyle = sunGrad;
             ctx.beginPath();
-            ctx.arc(canvas.width - 120, 65, 26, 0, Math.PI * 2);
+            ctx.arc(sunX, groundY - 30, 90, 0, Math.PI * 2);
             ctx.fill();
 
-            // Mountains
-            ctx.fillStyle = '#0f172a';
+            // Parallax Layer 1: Distant Mountain Silhouettes
+            ctx.fillStyle = '#170c27';
             ctx.beginPath();
             ctx.moveTo(0, groundY);
-            for (let i = -50; i <= canvas.width + 50; i += 50) {
-                let mtnH = Math.sin((i + cameraX * 0.1) * 0.006) * 55 + 65;
+            for (let i = -50; i <= canvas.width + 50; i += 40) {
+                let mtnH = Math.sin((i + cameraX * 0.1) * 0.008) * 55 + 65;
                 ctx.lineTo(i, groundY - mtnH);
             }
             ctx.lineTo(canvas.width, groundY);
             ctx.fill();
 
-            // Railway Telegraph Poles
-            for (let i = -300; i <= 3000; i += 220) {
-                let poleX = (i - cameraX) * scale;
-                if (poleX > -50 && poleX < canvas.width + 50) {
-                    ctx.strokeStyle = '#475569';
-                    ctx.lineWidth = 3;
+            // Parallax Layer 2: Trees & City Silhouettes
+            ctx.fillStyle = '#0a0518';
+            for (let i = -100; i <= 3000; i += 180) {
+                let treeX = (i - cameraX * 0.4) * scale;
+                if (treeX > -50 && treeX < canvas.width + 50) {
                     ctx.beginPath();
-                    ctx.moveTo(poleX, groundY - 10);
-                    ctx.lineTo(poleX, groundY - 95);
-                    ctx.moveTo(poleX - 12, groundY - 80);
-                    ctx.lineTo(poleX + 12, groundY - 80);
+                    ctx.arc(treeX, groundY - 35, 22, 0, Math.PI * 2);
+                    ctx.arc(treeX + 15, groundY - 45, 18, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillRect(treeX - 3, groundY - 35, 6, 35);
+                }
+            }
+
+            // Real-world Streetlights & Light Cones
+            for (let i = -200; i <= 3000; i += 250) {
+                let lightX = (i - cameraX) * scale;
+                if (lightX > -100 && lightX < canvas.width + 100) {
+                    // Pole
+                    ctx.strokeStyle = '#334155';
+                    ctx.lineWidth = 4;
+                    ctx.beginPath();
+                    ctx.moveTo(lightX, groundY);
+                    ctx.lineTo(lightX, groundY - 110);
+                    ctx.lineTo(lightX + 15, groundY - 110);
                     ctx.stroke();
+
+                    // Lamp Head
+                    ctx.fillStyle = '#fde047';
+                    ctx.beginPath();
+                    ctx.arc(lightX + 15, groundY - 110, 4, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Streetlight Cone
+                    let coneGrad = ctx.createLinearGradient(lightX + 15, groundY - 110, lightX + 15, groundY);
+                    coneGrad.addColorStop(0, 'rgba(253, 224, 71, 0.25)');
+                    coneGrad.addColorStop(1, 'transparent');
+                    ctx.fillStyle = coneGrad;
+                    ctx.beginPath();
+                    ctx.moveTo(lightX + 15, groundY - 110);
+                    ctx.lineTo(lightX - 45, groundY);
+                    ctx.lineTo(lightX + 75, groundY);
+                    ctx.closePath();
+                    ctx.fill();
                 }
             }
 
-            // Ground & Ballast
-            ctx.fillStyle = '#1e293b';
-            ctx.fillRect(0, groundY - 10, canvas.width, canvas.height - groundY + 10);
+            // Road Structure
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
 
-            // Railway Sleepers
-            ctx.fillStyle = '#451a03';
-            for (let s = -200; s <= 3000; s += 14) {
-                let sleeperX = (s - cameraX) * scale;
-                if (sleeperX >= -20 && sleeperX <= canvas.width + 20) {
-                    ctx.fillRect(sleeperX, groundY - 5, 7, 7);
-                }
-            }
+            // Curb
+            ctx.fillStyle = '#334155';
+            ctx.fillRect(0, groundY, canvas.width, 6);
 
-            // Metal Rails
-            ctx.fillStyle = '#94a3b8';
-            ctx.fillRect(0, groundY - 8, canvas.width, 3);
-            ctx.fillRect(0, groundY - 1, canvas.width, 3);
+            // Road Lane Dividers
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([35, 25]);
+            ctx.lineDashOffset = -(cameraX * scale) % 60;
+            ctx.beginPath();
+            ctx.moveTo(0, groundY + 45);
+            ctx.lineTo(canvas.width, groundY + 45);
+            ctx.stroke();
+            ctx.setLineDash([]);
 
             // Distance Markers
             ctx.fillStyle = '#64748b';
@@ -522,23 +542,24 @@
             for (let m = 0; m <= 3000; m += 20) {
                 let screenX = (m - cameraX) * scale;
                 if (screenX >= -20 && screenX <= canvas.width + 20) {
-                    ctx.fillText(m + 'm', screenX - 8, groundY + 20);
+                    ctx.fillRect(screenX, groundY + 6, 2, 8);
+                    ctx.fillText(m + 'm', screenX - 8, groundY + 28);
                 }
             }
 
             // Smoke Particles
-            for (let i = smokeParticles.length - 1; i >= 0; i--) {
-                let p = smokeParticles[i];
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
                 p.x += p.vx;
                 p.y += p.vy;
-                p.alpha -= 0.012;
+                p.alpha -= 0.015;
                 if (p.alpha <= 0) {
-                    smokeParticles.splice(i, 1);
+                    particles.splice(i, 1);
                     continue;
                 }
                 let px = (p.x - cameraX) * scale;
                 let py = groundY - (p.y * scale);
-                ctx.fillStyle = `rgba(226, 232, 240, ${p.alpha})`;
+                ctx.fillStyle = `rgba(203, 213, 225, ${p.alpha})`;
                 ctx.beginPath();
                 ctx.arc(px, py, p.size, 0, Math.PI * 2);
                 ctx.fill();
@@ -560,11 +581,12 @@
                 ctx.setLineDash([]);
             }
 
-            // Draw Train centered around Person's exact position
-            let personScreenX = (personX - cameraX) * scale;
-            drawSynchronizedTrain(personScreenX, groundY, personX);
+            // Draw Flipped HiAce Van & Boy (Facing RIGHT)
+            let vanScreenX = (vanX - cameraX) * scale;
+            let vanScreenY = groundY - 10;
+            drawRealisticHiAceVan(vanScreenX, vanScreenY, vanX, isThrowingAnim || isRunning);
 
-            // Draw Ball from exact hand position
+            // Draw Ball
             let ballScreenX = (ballX - cameraX) * scale;
             let ballScreenY = groundY - (ballY * scale);
 
@@ -572,7 +594,7 @@
                 ctx.shadowColor = '#f43f5e';
                 ctx.shadowBlur = 15;
                 ctx.beginPath();
-                ctx.arc(ballScreenX, ballScreenY, 7.5, 0, Math.PI * 2);
+                ctx.arc(ballScreenX, ballScreenY, 8.5, 0, Math.PI * 2);
                 ctx.fillStyle = '#fb7185';
                 ctx.fill();
                 ctx.lineWidth = 2;
@@ -581,148 +603,156 @@
                 ctx.shadowBlur = 0;
 
                 if (document.getElementById('chkVectors').checked && isRunning) {
-                    let v_train_0 = parseFloat(document.getElementById('v_train').value);
-                    drawArrow(ballScreenX, ballScreenY, ballScreenX + v_train_0 * 0.8, ballScreenY, '#38bdf8', 'Vx');
+                    let v_van_0 = parseFloat(document.getElementById('v_van').value);
+                    drawArrow(ballScreenX, ballScreenY, ballScreenX + v_van_0 * 0.8, ballScreenY, '#38bdf8', 'Vx');
                     drawArrow(ballScreenX, ballScreenY, ballScreenX, ballScreenY - curBallVy * 0.8, '#4ade80', 'Vy');
                 }
             }
         }
 
-        // --- DRAW TRAIN SYNCHRONIZED EXACTLY WITH PERSON AT X=0 ---
-        function drawSynchronizedTrain(x, y, dist) {
+        // --- FLIPPED HIACE VAN DRAWING (FACING RIGHT) ---
+        function drawRealisticHiAceVan(x, y, dist, isMoving) {
             ctx.save();
-            ctx.translate(x, y); // Local origin is EXACTLY Person's position on rail level!
+            ctx.translate(x, y);
 
-            const coachW = 35;
-            const coachH = 26;
-
-            // 1. COACHES
-            // Coach 3 (Rearmost)
-            drawCoach(-52.5, -10 - coachH, coachW, coachH, '#1e3a8a');
-            // Coach 2 (Middle Coach - Person stands on center X=0)
-            drawCoach(-17.5, -10 - coachH, coachW, coachH, '#1e3a8a');
-            // Coach 1 (Front Passenger Coach)
-            drawCoach(17.5, -10 - coachH, coachW, coachH, '#1e3a8a');
-
-            // 2. ENGINE
-            ctx.fillStyle = '#b91c1c';
-            ctx.fillRect(52.5, -10 - coachH, 38, coachH);
-            ctx.strokeStyle = '#0f172a';
-            ctx.lineWidth = 1.2;
-            ctx.strokeRect(52.5, -10 - coachH, 38, coachH);
-
-            // Cabin Roof & Chimney
-            ctx.fillStyle = '#991b1b';
-            ctx.fillRect(55.5, -10 - coachH - 5, 18, 5);
-            ctx.fillStyle = '#1e293b';
-            ctx.fillRect(80, -10 - coachH - 10, 6, 10);
-            ctx.fillRect(78, -10 - coachH - 12, 10, 3);
-
-            // Engine Nose Grille & Headlight
-            ctx.fillStyle = '#f59e0b';
+            // Headlight Beam Light (Flipped - facing RIGHT)
+            let headlightGlow = ctx.createRadialGradient(65, -18, 5, 170, -18, 90);
+            headlightGlow.addColorStop(0, 'rgba(253, 224, 71, 0.5)');
+            headlightGlow.addColorStop(1, 'rgba(253, 224, 71, 0)');
+            ctx.fillStyle = headlightGlow;
             ctx.beginPath();
-            ctx.moveTo(90.5, -10 - coachH);
-            ctx.lineTo(99.5, -22);
-            ctx.lineTo(90.5, -13);
+            ctx.moveTo(65, -28);
+            ctx.lineTo(190, -5);
+            ctx.lineTo(190, 10);
+            ctx.lineTo(65, -8);
             ctx.closePath();
             ctx.fill();
 
-            ctx.fillStyle = '#fde047';
-            ctx.beginPath();
-            ctx.arc(90.5, -22, 4, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Headlight Cone Beam
-            let lightGlow = ctx.createRadialGradient(92.5, -22, 2, 210, -22, 70);
-            lightGlow.addColorStop(0, 'rgba(253, 224, 71, 0.65)');
-            lightGlow.addColorStop(1, 'rgba(253, 224, 71, 0)');
-            ctx.fillStyle = lightGlow;
-            ctx.beginPath();
-            ctx.moveTo(92.5, -26);
-            ctx.lineTo(220, -10);
-            ctx.lineTo(220, 0);
-            ctx.lineTo(92.5, -16);
-            ctx.closePath();
-            ctx.fill();
-
-            // 3. PERSON (Centered EXACTLY at X=0)
+            // --- ANIMATED BOY IN ROOF HATCH ---
             ctx.save();
-            ctx.translate(0, -10 - coachH); // Standing on middle coach roof
+            ctx.translate(5, -54); // Hatch position
 
-            // Body
-            ctx.fillStyle = '#0284c7';
-            ctx.fillRect(-5, -12, 10, 12);
+            // Boy Body
+            ctx.fillStyle = '#2563eb';
+            ctx.fillRect(-7, 10, 14, 12);
 
-            // Head
+            // Boy Head
             ctx.fillStyle = '#fde047';
             ctx.beginPath();
-            ctx.arc(0, -17, 5, 0, Math.PI * 2);
+            ctx.arc(0, 2, 7, 0, Math.PI * 2);
             ctx.fill();
 
-            // Arm & Hand (Hand is at local Y = -10, which is Y = -46px relative to ground)
+            // Boy Arm (Throwing to the RIGHT)
             ctx.strokeStyle = '#fde047';
-            ctx.lineWidth = 2.5;
+            ctx.lineWidth = 3.5;
             ctx.beginPath();
-            ctx.moveTo(0, -10);
-            let handX = Math.cos(throwArmAngle - Math.PI / 2) * 10;
-            let handY = -10 - Math.sin(throwArmAngle - Math.PI / 2) * 10;
+            ctx.moveTo(-2, 12);
+            let handX = -2 + Math.cos(throwArmAngle - 0.5) * 14;
+            let handY = 12 - Math.sin(throwArmAngle - 0.5) * 14;
             ctx.lineTo(handX, handY);
             ctx.stroke();
 
-            // Ball in hand before throw
             if (isThrowingAnim) {
                 ctx.fillStyle = '#fb7185';
                 ctx.beginPath();
-                ctx.arc(handX, handY, 4.5, 0, Math.PI * 2);
+                ctx.arc(handX, handY, 6, 0, Math.PI * 2);
                 ctx.fill();
             }
             ctx.restore();
 
-            // 4. WHEELS
-            const wheelXPositions = [-45, -30, -10, 5, 25, 40, 60, 80];
-            wheelXPositions.forEach(wx => drawTrainWheel(wx, -5, dist));
+            // --- TOYOTA HIACE / KDH VAN BODY ---
+            ctx.fillStyle = '#f8fafc';
+            ctx.beginPath();
+            ctx.moveTo(-65, -52); 
+            ctx.lineTo(35, -52);  
+            ctx.lineTo(65, -20);  
+            ctx.lineTo(67, -8);   
+            ctx.lineTo(67, -2);   
+            ctx.lineTo(-65, -2);  
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Roof Hatch Cutout
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(-5, -53, 20, 3);
+
+            // HiAce Side Windows
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.moveTo(-58, -45);
+            ctx.lineTo(30, -45);
+            ctx.lineTo(56, -22);
+            ctx.lineTo(56, -18);
+            ctx.lineTo(-58, -18);
+            ctx.closePath();
+            ctx.fill();
+
+            // Sliding Door Track Line
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(-35, -15);
+            ctx.lineTo(15, -15);
+            ctx.stroke();
+
+            // Side Skirt Kit Line
+            ctx.fillStyle = '#e2e8f0';
+            ctx.fillRect(-65, -5, 132, 4);
+
+            // Headlight Assembly
+            ctx.fillStyle = '#fde047';
+            ctx.fillRect(62, -22, 5, 12);
+            ctx.strokeStyle = '#0f172a';
+            ctx.strokeRect(62, -22, 5, 12);
+
+            // Taillight Assembly
+            ctx.fillStyle = '#ef4444';
+            ctx.fillRect(-66, -30, 3, 18);
+
+            // Side Mirror
+            ctx.fillStyle = '#cbd5e1';
+            ctx.fillRect(45, -22, 6, 5);
+
+            // Wheels
+            drawKDHAlloyWheel(-35, 0, dist);
+            drawKDHAlloyWheel(35, 0, dist);
 
             ctx.restore();
         }
 
-        function drawCoach(x, y, w, h, color) {
-            ctx.fillStyle = color;
-            ctx.fillRect(x, y, w, h);
-            ctx.strokeStyle = '#0f172a';
-            ctx.lineWidth = 1.2;
-            ctx.strokeRect(x, y, w, h);
-
-            // Windows
-            ctx.fillStyle = '#fde047';
-            ctx.fillRect(x + 5, y + 6, 7, 9);
-            ctx.fillRect(x + 14, y + 6, 7, 9);
-            ctx.fillRect(x + 23, y + 6, 7, 9);
-
-            // Joint
-            ctx.fillStyle = '#334155';
-            ctx.fillRect(x + w, y + h - 11, 4, 6);
-        }
-
-        function drawTrainWheel(wx, wy, dist) {
+        function drawKDHAlloyWheel(wx, wy, dist) {
             ctx.save();
             ctx.translate(wx, wy);
-            ctx.rotate(dist * 0.15);
+            ctx.rotate(dist * 0.12);
 
             ctx.beginPath();
-            ctx.arc(0, 0, 5, 0, Math.PI * 2);
-            ctx.fillStyle = '#475569';
+            ctx.arc(0, 0, 14, 0, Math.PI * 2);
+            ctx.fillStyle = '#1e293b';
             ctx.fill();
-            ctx.lineWidth = 1.2;
+            ctx.lineWidth = 2;
             ctx.strokeStyle = '#0f172a';
             ctx.stroke();
 
-            ctx.strokeStyle = '#94a3b8';
-            ctx.lineWidth = 1;
-            for (let i = 0; i < 4; i++) {
+            ctx.beginPath();
+            ctx.arc(0, 0, 9, 0, Math.PI * 2);
+            ctx.fillStyle = '#94a3b8';
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(0, 0, 3, 0, Math.PI * 2);
+            ctx.fillStyle = '#0f172a';
+            ctx.fill();
+
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 1.8;
+            for (let i = 0; i < 6; i++) {
                 ctx.beginPath();
                 ctx.moveTo(0, 0);
-                let angle = (i * Math.PI) / 2;
-                ctx.lineTo(Math.cos(angle) * 5, Math.sin(angle) * 5);
+                let angle = (i * Math.PI * 2) / 6;
+                ctx.lineTo(Math.cos(angle) * 9, Math.sin(angle) * 9);
                 ctx.stroke();
             }
 
@@ -760,29 +790,15 @@
             let resBox = document.getElementById('resultBox');
             resBox.style.display = 'block';
 
-            // Boundaries relative to person (X=0)
-            let rearTrainMeters = -52.5 / scale; // Rear of train
-            let frontTrainMeters = 90.5 / scale;  // Front nose of engine
-
-            if (Math.abs(diff) < 0.8) {
+            if (Math.abs(diff) < 0.6) {
                 resBox.className = 'result-banner res-success';
-                resBox.innerHTML = '🎯 බෝලය නැවතත් කෙළින්ම ළමයාගේ අතටම පතිත විය!';
-            } 
-            else if (diff >= rearTrainMeters && diff <= frontTrainMeters) {
-                resBox.className = 'result-banner res-roof';
-                if (acceleration > 0) {
-                    resBox.innerHTML = '⚠️ දුම්රිය ත්වරණය වූ නිසා බෝලය ළමයාගේ අතට නොපැමිණ, දුම්රියේ පසුපස වහලයක් මතට පතිත විය! (&Delta;S = ' + Math.abs(diff).toFixed(1) + 'm)';
-                } else {
-                    resBox.innerHTML = '⚠️ දුම්රිය මන්දනය වූ නිසා බෝලය ළමයාගේ අතට නොපැමිණ, දුම්රියේ ඉදිරිපස වහලයක් මතට පතිත විය! (&Delta;S = ' + Math.abs(diff).toFixed(1) + 'm)';
-                }
-            } 
-            else if (diff < rearTrainMeters) {
+                resBox.innerHTML = '🎯 බෝලය නැවතත් වෑන් රථය තුළටම (ළමයාගේ අතටම) පතිත විය!';
+            } else if (acceleration > 0) {
                 resBox.className = 'result-banner res-behind';
-                resBox.innerHTML = '⚠️ දුම්රිය අධික ලෙස ත්වරණය වූ නිසා බෝලය දුම්රියටත් පිටුපසින් පාරට පතිත විය! (&Delta;S = ' + Math.abs(diff).toFixed(1) + 'm)';
-            } 
-            else {
-                resBox.className = 'result-banner res-behind';
-                resBox.innerHTML = '⚠️ දුම්රිය අධික ලෙස මන්දනය වූ නිසා බෝලය දුම්රියටත් ඉදිරියෙන් පාරට පතිත විය! (&Delta;S = ' + Math.abs(diff).toFixed(1) + 'm)';
+                resBox.innerHTML = '⚠️ වෑන් රථය ත්වරණය වූ නිසා බෝලය වෑන් රථයට පසුපසින් වැටුණි! (&Delta;S = ' + Math.abs(diff).toFixed(1) + 'm)';
+            } else {
+                resBox.className = 'result-banner res-front';
+                resBox.innerHTML = '⚠️ වෑන් රථය මන්දනය වූ නිසා බෝලය වෑන් රථයට ඉදිරියෙන් වැටුණි! (&Delta;S = ' + Math.abs(diff).toFixed(1) + 'm)';
             }
         }
 
@@ -792,15 +808,15 @@
             isThrowingAnim = false;
             throwArmAngle = 0;
             ballTrail = [];
-            smokeParticles = [];
+            particles = [];
 
             document.getElementById('hud-time').innerText = '0.00 s';
             document.getElementById('hud-ball').innerText = '0.0 m';
-            document.getElementById('hud-train').innerText = '0.0 m';
+            document.getElementById('hud-van').innerText = '0.0 m';
             document.getElementById('hud-diff').innerText = '0.0 m';
             document.getElementById('resultBox').style.display = 'none';
 
-            drawScene(160, 160, handHeightMeters, 0, 0, 0);
+            drawScene(120, 120, 64 / 2.2, 0, 2.2, 0, 0);
         }
 
         resetSimulation();
